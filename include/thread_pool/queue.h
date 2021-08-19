@@ -42,7 +42,7 @@ class Queue {
 
         // consume existing task
         // TODO(jpinyot): return the return value of the function
-        bool Consume(F& result) {
+        auto Consume(F& result) {
             // wait until acquire exclusivity
             while (_consumerLock.exchange(true)) {
             }
@@ -83,7 +83,7 @@ class Queue {
             private:
                 // TODO(jpinyot): pass to raw pointers or unique_ptr to avoid blocking
                 // while copyng the argument
-                std::function<F> _function;
+                std::function<F(Args ...)> _function;
                 std::tuple<Args ...> _args;
                 std::atomic<F> _next;
                 //TODO(jpinyot): add padd to each pointer
