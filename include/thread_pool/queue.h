@@ -55,16 +55,16 @@ class Queue {
         }
 
         // consume existing task
-        // TODO(jpinyot): delete tasks
         void Consume() {
             // wait until acquire exclusivity
             while (_consumerLock.exchange(true)) {
             }
 
             Task* next = _first->next;
+            Task* oldFirst = _first;
             // if queue is nonempty
             if (next != nullptr) {
-                // copy function and arguments from the Task
+                // get function from the Task
                 auto function = next->GetFunction();
                 _first = next;
                 // release exclusivity
@@ -73,6 +73,8 @@ class Queue {
                 if (function.valid()) {
                     function();
                 }
+                // delete old first Task
+                delete oldFirst;
             }
             // queue is empty
             else {
