@@ -96,7 +96,13 @@ class Queue {
 
             public:
                 // return if the function is valid
-                bool isValid() const {return _function.valid();}
+                bool IsValid() const {return _function.valid();}
+                // execute task if it is valid
+                void Execute() {
+                    if (this->IsValid()) {
+                        _function();
+                    }
+                }
                 // pointer to the next object in the Queue
                 // TODO(jpinyot): Move to private
                 std::atomic<Task*> next;
