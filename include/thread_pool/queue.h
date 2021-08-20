@@ -2,6 +2,7 @@
 #include <future>
 #include <functional>
 #include <tuple>
+#include <utility>
 
 //TODO(jpinyot): change to correct cache line size
 constexpr uint32_t kCacheLineSize = 128;
@@ -27,7 +28,15 @@ class Queue {
         // add new task to the queue
         template<class F, class ... Args>
         void Produce(const F&& function, const Args&& ... args) {
-            /* auto tmp = new Task<F, std::tuple<Args ...>>(std::forward<F>(function), std::forward<Args>(args)...); */
+            // get return type
+            typedef decltype(f(args...)) RetType;
+            // package the task
+            std::packaged_task<RetType()> newTask(std::move(std::bind(function, args...)));
+            // get the future from the task before the task is moved into the queue
+            std::future<RetType> future = newTask.get_future();
+            // cretate new Task
+            Task* tmp = new Task(AnyTask<RetType>(std::move(newTask)));
+
             // wait until acquire exclusivity
             while (_producerLock.exchange(true)) {
             }
@@ -38,6 +47,8 @@ class Queue {
             _last = tmp;
             // release exclusivity
             _producerLock = false;
+
+            // TODO(jpinyot): notofy a thread that there is a new job!!!??
         }
 
         // consume existing task
@@ -91,6 +102,7 @@ class Queue {
                 //TODO(jpinyot): add padd to each pointer
         };
 
+        // used polymorphism to store any type of funtion in the job
         template <typename RetType>
         class AnyTask : public Task {
             private:
