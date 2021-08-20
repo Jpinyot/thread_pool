@@ -55,32 +55,31 @@ class Queue {
         }
 
         // consume existing task
-        // TODO(jpinyot): return the return value of the function
-        /* template<class F, class ... Args> */
-        /* auto Consume(F& result) { */
-        /*     // wait until acquire exclusivity */
-        /*     while (_consumerLock.exchange(true)) { */
-        /*     } */
+        // TODO(jpinyot): delete tasks
+        void Consume() {
+            // wait until acquire exclusivity
+            while (_consumerLock.exchange(true)) {
+            }
 
-        /*     Task* next = _first->next; */
-        /*     // if queue is nonempty */
-        /*     if (next != nullptr) { */
-        /*         // copy function and arguments from the Task */
-        /*         F function = next->_function; */
-        /*         std::tuple<Args ...> args = next->_args; */
-        /*         _first = next; */
-        /*         // release exclusivity */
-        /*         _consumerLock.exchange(false); */
-        /*         //TODO(jpinyot): execute function if exist */
-        /*         return true; */
-        /*     } */
-        /*     // queue is empty */
-        /*     else { */
-        /*         // release exclusivity */
-        /*         _consumerLock.exchange(false); */
-        /*         return false; */
-        /*     } */
-        /* } */
+            Task* next = _first->next;
+            // if queue is nonempty
+            if (next != nullptr) {
+                // copy function and arguments from the Task
+                auto function = next->GetFunction();
+                _first = next;
+                // release exclusivity
+                _consumerLock.exchange(false);
+                // execute function if is valid
+                if (function.valid()) {
+                    function();
+                }
+            }
+            // queue is empty
+            else {
+                // release exclusivity
+                _consumerLock.exchange(false);
+            }
+        }
 
 
     private:
