@@ -9,20 +9,20 @@ constexpr uint32_t kCacheLineSize = 128;
 
 class Queue {
     public:
-        /* Queue(): */
-        /*     _first(nullptr), _divider(nullptr), _last(nullptr), */
-        /*     _consumerLock(false), _producerLock(false) { */
-        /*     // init list with dummy element */
-        /*     _first = _divider = _last = new Task(nullptr, nullptr); */
-        /* } */
-        /* ~Queue() { */
-        /*     // delete all pending tasks */
-        /*     while (_first != nullptr) { */
-        /*         Task* tmp = _first; */
-        /*         _first = _first->next; */
-        /*         delete tmp; */
-        /*     } */
-        /* } */
+        Queue():
+            _first(nullptr), _divider(nullptr), _last(nullptr),
+            _consumerLock(false), _producerLock(false) {
+            // init list with dummy element
+            _first = _divider = _last = new Task();
+        }
+        ~Queue() {
+            // delete all pending tasks
+            while (_first != nullptr) {
+                Task* tmp = _first;
+                _first = _first->next;
+                delete tmp;
+            }
+        }
 
     public:
         // add new task to the queue
