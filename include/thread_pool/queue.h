@@ -87,7 +87,6 @@ class Queue {
         // class Task is a node of the Queue holding the task to be executed
         class Task {
             public:
-                // TODO(jpinyot): check if makes sense to change pointer to references
                 Task():
                     next(nullptr),
                     _function() {
@@ -98,11 +97,14 @@ class Queue {
                 // return if the function is valid
                 bool IsValid() const {return _function.valid();}
                 // execute task if it is valid
+                // TODO(jpinyot): delete method??
                 void Execute() {
                     if (this->IsValid()) {
                         _function();
                     }
                 }
+                // get function
+                std::packaged_task<void()>GetFunction() {return std::move(_function);}
                 // pointer to the next object in the Queue
                 // TODO(jpinyot): Move to private
                 std::atomic<Task*> next;
