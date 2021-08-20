@@ -10,10 +10,10 @@ constexpr uint32_t kCacheLineSize = 128;
 class Queue {
     public:
         Queue():
-            _first(nullptr), _divider(nullptr), _last(nullptr),
+            _first(nullptr), _last(nullptr),
             _consumerLock(false), _producerLock(false) {
             // init list with dummy element
-            _first = _divider = _last = new Task();
+            _first = _last = new Task();
         }
         ~Queue() {
             // delete all pending tasks
@@ -128,14 +128,9 @@ class Queue {
             }
         };
 
-        //TODO(jpinyot): add padd to each pointer
+        //TODO(jpinyot): add padding to each pointer
         // first element
-        //TODO(jpinyot): change void pointers to Task pointer
-        /* template<class F, class ... Args> */
-        /* Task<F, std::tuple<Args ...>>* _first; */
         Task* _first;
-        // dummy element
-        Task* _divider;
         // last element
         Task* _last;
         // shared among consumers
