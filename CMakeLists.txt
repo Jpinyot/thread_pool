@@ -21,6 +21,10 @@ add_definitions(-DPARSER_NISX_LIB_VERSION_BUILD=${PROJECT_VERSION_PATCH})
 add_definitions(-DPARSER_NISX_LIB_VERSION="${PROJECT_VERSION}")
 add_definitions(-DPARSER_NISX_LIBRARY) #Legacy define
 
+################### EXTERNAL DEPENDENCIES  ############################
+find_package(Threads REQUIRED)
+set(EXTERNAL_LIBS Threads::Threads)
+
 ##################  LOADING MODULES  ###########################
 # include(${PROJECT_SOURCE_DIR}/cmake/dependencies.cmake)
 
