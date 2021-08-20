@@ -95,6 +95,9 @@ class Queue {
                 ~Task() = default;
 
             public:
+                // return if the function is valid
+                bool isValid() const {return _function.valid();}
+                // pointer to the next object in the Queue
                 // TODO(jpinyot): Move to private
                 std::atomic<Task*> next;
 
@@ -112,6 +115,7 @@ class Queue {
                 std::packaged_task<RetType()> _function;
             public:
                 AnyTask(std::packaged_task<RetType()> function):
+                    Task(),
                     _function(std::move(function))
             {
             }
