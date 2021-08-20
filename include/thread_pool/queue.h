@@ -95,15 +95,8 @@ class Queue {
                 ~Task() = default;
 
             public:
-                // return if the function is valid
+                // return true if the function is valid
                 bool IsValid() const {return _function.valid();}
-                // execute task if it is valid
-                // TODO(jpinyot): delete method??
-                void Execute() {
-                    if (this->IsValid()) {
-                        _function();
-                    }
-                }
                 // get function
                 std::packaged_task<void()>GetFunction() {return std::move(_function);}
                 // pointer to the next object in the Queue
@@ -111,10 +104,9 @@ class Queue {
                 std::atomic<Task*> next;
 
             private:
-                // TODO(jpinyot): pass to raw pointers or unique_ptr to avoid blocking
                 // while copyng the argument
                 std::packaged_task<void()> _function;
-                //TODO(jpinyot): add padd to each pointer
+                //TODO(jpinyot): add padding??
         };
 
         // used polymorphism to store any type of funtion in the job
