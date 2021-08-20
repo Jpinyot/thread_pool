@@ -27,7 +27,7 @@ class Queue {
     public:
         // add new task to the queue
         template<class F, class ... Args>
-        void Produce(const F&& function, const Args&& ... args) {
+        auto Produce(const F&& function, const Args&& ... args) {
             // get return type
             typedef decltype(f(args...)) RetType;
             // package the task
@@ -49,6 +49,9 @@ class Queue {
             _producerLock = false;
 
             // TODO(jpinyot): notofy a thread that there is a new job!!!??
+
+            // return the future
+            return future;
         }
 
         // consume existing task
