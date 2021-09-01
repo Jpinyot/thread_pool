@@ -77,8 +77,8 @@ TEST_F(QueueUt, OneProducerOneConsumerMultiTasks)
     t1.join();
 }
 
-// one producers threads and multi consumer thread with multiple Tasks
-TEST_F(QueueUt, OneProducersMultiConsumerMultiTasks)
+// one producer and multi consumers with multiple Tasks
+TEST_F(QueueUt, OneProducerMultiConsumerMultiTasks)
 {
     std::atomic<bool> exit;
     exit.exchange(false);
@@ -116,8 +116,8 @@ int fibonacci(const int& n) {
     return fibonacci(n-1) + fibonacci(n-2);
 }
 
-// one producers threads and multi consumer thread with multiple big Tasks
-TEST_F(QueueUt, OneProducersMultiConsumerMultiBigTasks)
+// one producer and multi consumers with multiple big Tasks
+TEST_F(QueueUt, OneProducerMultiConsumerMultiBigTasks)
 {
     std::atomic<bool> exit;
     exit.exchange(false);
@@ -156,6 +156,7 @@ TEST_F(QueueUt, OneProducersMultiConsumerMultiBigTasks)
     t4.join();
 }
 
+// return a vector of futures from the Tasks added to the Queue
 auto getFutures(Queue* q, const int& numOfTasks) {
 
     auto sumOne = [](const int& n) {return n + 1;};
@@ -167,8 +168,8 @@ auto getFutures(Queue* q, const int& numOfTasks) {
     return futures;
 }
 
-// multi producers threads and multi consumer threads with multiple Tasks
-TEST_F(QueueUt, MultiProducersMultiConsumerMultiTasks)
+// multi producers and multi consumers with multiple Tasks
+TEST_F(QueueUt, MultiProducersMultiConsumersMultiTasks)
 {
     std::atomic<bool> exit;
     exit.exchange(false);
