@@ -72,16 +72,18 @@ namespace thread_pool {
                 Task* oldFirst = _first;
                 // if queue is nonempty
                 if (next != nullptr) {
+                    // TODO(jpinyto): get function to avoid data races
                     // get function from the Task
-                    auto function = next->GetFunction();
+                    /* auto function = next->GetFunction(); */
                     // move first pointer to the next pointer
                     _first = next;
                     // release exclusivity
                     _consumerLock.exchange(false);
                     // execute function if is valid
-                    if (function.valid()) {
-                        function();
-                    }
+                    next->Execute();
+                    /* if (function.valid()) { */
+                    /*     function(); */
+                    /* } */
                     // delete old first Task
                     // TODO(jpinyot): move to the critical section??
                     delete oldFirst;
