@@ -100,16 +100,15 @@ namespace thread_pool {
                 public:
                     Task():
                         next(nullptr) {
-                        /* _function() { */
                     }
-                    ~Task() = default;
-
+                    virtual ~Task() = default;
                 public:
-                    // get function
-                    virtual std::packaged_task<void()> GetFunction() {};
                     // pointer to the next object in the Queue
-                    // TODO(jpinyot): Move to private
                     std::atomic<Task*> next;
+
+                    // get function return a non valid packaged_task
+                    virtual std::packaged_task<void()> GetFunction()
+                    {return std::packaged_task<void()>();}
             };  // class Task
 
             // used polymorphism to store any type of funtion in the job
@@ -124,6 +123,7 @@ namespace thread_pool {
                 std::packaged_task<void()>GetFunction() override {return std::move(_function);}
 
                 private:
+                    // task to be executed
                     std::packaged_task<void()> _function;
             };  // class AnyTask
 
