@@ -1,3 +1,4 @@
+#include <future>
 #include <thread>
 #include <atomic>
 
@@ -147,6 +148,52 @@ TEST_F(QueueUt, OneProducersMultiConsumerMultiBigTasks)
     EXPECT_EQ(fib35.get(), 9227465);
     EXPECT_EQ(fib36.get(), 14930352);
     EXPECT_EQ(fib37.get(), 24157817);
+
+    exit.exchange(true);
+    t1.join();
+    t2.join();
+    t3.join();
+    t4.join();
+}
+
+auto getFutures(Queue* q, const int& numOfTasks) {
+
+    auto sumOne = [](const int& n) {return n + 1;};
+    std::vector<std::future<int>> futures;
+
+    for (int i = 0; i < numOfTasks; i++) {
+        futures.emplace_back(q->Produce(sumOne, i));
+    }
+    return futures;
+}
+
+// multi producers threads and multi consumer threads with multiple Tasks
+TEST_F(QueueUt, MultiProducersMultiConsumerMultiTasks)
+{
+    std::atomic<bool> exit;
+    exit.exchange(false);
+    const int numOfTasks = 1000;
+
+    auto consume = [&exit](Queue* q) {while(!exit) {q->Consume();}};
+
+    std::thread t1(consume, this->_queue);
+    std::thread t2(consume, this->_queue);
+    std::thread t3(consume, this->_queue);
+    std::thread t4(consume, this->_queue);
+
+    auto futures1 = std::async(getFutures, _queue, numOfTasks);
+    auto futures2 = std::async(getFutures, _queue, numOfTasks);
+    auto futures3 = std::async(getFutures, _queue, numOfTasks);
+
+    auto futuresV1 = futures1.get();
+    auto futuresV2 = futures2.get();
+    auto futuresV3 = futures3.get();
+
+    for (int i = 0; i < numOfTasks; i++) {
+        EXPECT_EQ(futuresV1.at(i).get(), i + 1);
+        EXPECT_EQ(futuresV2.at(i).get(), i + 1);
+        EXPECT_EQ(futuresV3.at(i).get(), i + 1);
+    }
 
     exit.exchange(true);
     t1.join();
