@@ -35,5 +35,8 @@
 build
 b
 
+# SWP files
+*.swp
+
 # Compile commands
 compile_commands.json

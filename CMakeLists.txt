@@ -32,14 +32,32 @@ set(EXTERNAL_LIBS Threads::Threads)
 
 option(BUILD_SHARED_LIBS "Build Shared librarys" ON)
 option(BUILD_STATIC_LIBS "Build Static librarys" ON)
+option(ENABLE_TESTS "Enable tests" ON)
 
 set(SOURCES)
 set(HEADERS)
 
-# if (${ENABLE_TESTS})
-# 	set(SRC_TEST)
-# 	set(HDRS_TEST)
-# endif()
+if (${ENABLE_TESTS})
+    # find gtest librarys
+    set(GTEST_LIBS  GTest::GTest
+                    GTest::Main
+                    gmock
+                    gmock_main
+                    )
+    enable_testing()
+    find_package(GTest REQUIRED)
+    if (NOT GMOCK_INCLUDE_DIRS)
+        set(GMOCK_INCLUDE_DIRS ${GTEST_INCLUDE_DIRS})
+    endif()
+    include_directories(${GTEST_INCLUDE_DIRS})
+    include_directories(${GMOCK_INCLUDE_DIRS})
+    message("*** GTEST_INCLUDE_DIRS:  ${GTEST_INCLUDE_DIRS}")
+    message("*** GMOCK_INCLUDE_DIRS:  ${GMOCK_INCLUDE_DIRS}")
+    add_definitions(-DVIRTUAL_MOCK=virtual)
+    # set tests files
+	set(SRC_TEST)
+	set(HDRS_TEST)
+endif()
 
 add_definitions(-DTIXML_USE_STL)
 
@@ -89,7 +107,7 @@ endif()
 
 if (${ENABLE_TESTS})
 	message("Adding ${PROJECT_NAME} tests dir ${PROJECT_BINARY_DIR}" )
-	set(PROJECT_TEST_NAME ${PROJECT_NAME}Tests)
+	set(PROJECT_TEST_NAME ${PROJECT_NAME}_tests)
 	link_directories(${PROJECT_BINARY_DIR}/lib)
 
 	add_executable(${PROJECT_TEST_NAME} ${SRC_TEST} ${HDRS_TEST})
