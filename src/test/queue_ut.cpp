@@ -76,8 +76,8 @@ TEST_F(QueueUt, OneProducerOneConsumerMultiTasks)
     t1.join();
 }
 
-// multi producers threads and one consumer thread with multiple Tasks
-TEST_F(QueueUt, MultiProducersOneConsumerMultiTasks)
+// one producers threads and multi consumer thread with multiple Tasks
+TEST_F(QueueUt, OneProducersMultiConsumerMultiTasks)
 {
     std::atomic<bool> exit;
     exit.exchange(false);
@@ -115,8 +115,8 @@ int fibonacci(const int& n) {
     return fibonacci(n-1) + fibonacci(n-2);
 }
 
-// multi producers threads and one consumer thread with multiple big Tasks
-TEST_F(QueueUt, MultiProducersOneConsumerMultiBigTasks)
+// one producers threads and multi consumer thread with multiple big Tasks
+TEST_F(QueueUt, OneProducersMultiConsumerMultiBigTasks)
 {
     std::atomic<bool> exit;
     exit.exchange(false);
