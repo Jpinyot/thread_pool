@@ -99,37 +99,45 @@ namespace thread_pool {
             class Task {
                 public:
                     Task():
-                        next(nullptr),
-                        _function() {
+                        next(nullptr) {
+                        /* _function() { */
                         }
                     ~Task() = default;
 
                 public:
-                    // return true if the function is valid
-                    bool IsValid() const {return _function.valid();}
                     // get function
-                    std::packaged_task<void()>GetFunction() {return std::move(_function);}
+                    /* virtual std::packaged_task<void()>GetFunction() = 0; */
+                    /* virtual std::packaged_task<void()>GetFunction() {}; */
+                    // execute
+                    virtual void Execute() {};
                     // pointer to the next object in the Queue
                     // TODO(jpinyot): Move to private
                     std::atomic<Task*> next;
 
                 private:
                     // while copyng the argument
-                    std::packaged_task<void()> _function;
+                    /* std::packaged_task<void()> _function; */
                     //TODO(jpinyot): add padding??
             };  // class Task
 
             // used polymorphism to store any type of funtion in the job
             template <typename RetType>
                 class AnyTask : public Task {
-                    private:
-                        std::packaged_task<RetType()> _function;
                     public:
                         AnyTask(std::packaged_task<RetType()> function):
                             Task(),
                             _function(std::move(function))
                     {
                     }
+                    void Execute() override {
+                        if (_function.valid()) {
+                            _function();
+                        }
+                    }
+                    /* std::packaged_task<RetType()>GetFunction() override {return std::move(_function);} */
+
+                    private:
+                        std::packaged_task<RetType()> _function;
                 };  // class AnyTask
 
             //TODO(jpinyot): add padding to each pointer
