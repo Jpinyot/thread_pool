@@ -7,8 +7,6 @@
 //TODO(jpinyot): change to correct cache line size
 constexpr uint32_t kCacheLineSize = 128;
 
-// TODO(jpinyot): Allocate dynamically the function to extract the copy from the critical section
-
 // Lock-free Queue of Tasks:
 //  - the first element is ALWAYS a dummy element that is deleted after executing the next element,
 //    after deleting the first element, the executed elements becomes the dummy element.
@@ -35,16 +33,17 @@ namespace thread_pool {
 
         public:
             // add new task to the queue
+            // returns a future
             template<class F, class ... Args>
-                auto Produce(const F&& function, const Args&& ... args) {
+                auto Produce(F&& function, Args&& ... args) {
                     // get return type
-                    typedef decltype(f(args...)) RetType;
+                    typedef decltype(function(args...)) RetType;
                     // package the task
                     std::packaged_task<RetType()> newTask(std::move(std::bind(function, args...)));
                     // get the future from the task before the task is moved into the queue
                     std::future<RetType> future = newTask.get_future();
                     // cretate new Task
-                    Task* tmp = new Task(AnyTask<RetType>(std::move(newTask)));
+                    Task* tmp = new AnyTask<RetType>(std::move(newTask));
 
                     // wait until acquire exclusivity
                     while (_producerLock.exchange(true)) {
