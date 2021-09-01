@@ -52,7 +52,7 @@ TEST_F(QueueUt, OneThreadProduceAndConsume)
 }
 
 // one producer thread and one consumer thread with multiple Tasks
-TEST_F(QueueUt, OneConsumerOneProducerMultiTasks)
+TEST_F(QueueUt, OneProducerOneConsumerMultiTasks)
 {
     std::atomic<bool> exit;
     exit.exchange(false);
@@ -74,4 +74,37 @@ TEST_F(QueueUt, OneConsumerOneProducerMultiTasks)
 
     exit.exchange(true);
     t1.join();
+}
+
+// multi producers threads and one consumer thread with multiple Tasks
+TEST_F(QueueUt, MultiProducersOneConsumerMultiTasks)
+{
+    std::atomic<bool> exit;
+    exit.exchange(false);
+
+    auto consume = [&exit](Queue* q) {while(!exit) {q->Consume();}};
+    auto sumOne = [](int &n) {return n + 1;};
+
+    std::thread t1(consume, this->_queue);
+    std::thread t2(consume, this->_queue);
+    std::thread t3(consume, this->_queue);
+
+    auto retTwo = _queue->Produce(sumOne, 1);
+    auto retThree = _queue->Produce(sumOne, 2);
+    auto retFour = _queue->Produce(sumOne, 3);
+    auto retFive = _queue->Produce(sumOne, 4);
+    auto retSix = _queue->Produce(sumOne, 5);
+    auto retSeven = _queue->Produce(sumOne, 6);
+
+    EXPECT_EQ(retTwo.get(), 2);
+    EXPECT_EQ(retThree.get(), 3);
+    EXPECT_EQ(retFour.get(), 4);
+    EXPECT_EQ(retFive.get(), 5);
+    EXPECT_EQ(retSix.get(), 6);
+    EXPECT_EQ(retSeven.get(), 7);
+
+    exit.exchange(true);
+    t1.join();
+    t2.join();
+    t3.join();
 }
