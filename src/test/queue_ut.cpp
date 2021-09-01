@@ -1,5 +1,7 @@
-#include "gtest/gtest.h"
 #include <thread>
+#include <atomic>
+
+#include "gtest/gtest.h"
 #include "thread_pool/queue.h"
 
 using thread_pool::Queue;
@@ -41,13 +43,35 @@ TEST_F(QueueUt, setupTearDown)
 // produce and consume one Task using only one thread
 TEST_F(QueueUt, OneThreadProduceAndConsume)
 {
-
-    int num = 1;
-
     auto sumOne = [](int &n) {return n + 1;};
 
-    auto retNum = _queue->Produce(sumOne, num);
+    auto retNum = _queue->Produce(sumOne, 1);
     _queue->Consume();
 
     EXPECT_EQ(retNum.get(), 2);
+}
+
+// one producer thread and one consumer thread with multiple Tasks
+TEST_F(QueueUt, OneConsumerOneProducerMultiTasks)
+{
+    std::atomic<bool> exit;
+    exit.exchange(false);
+
+    auto consume = [&exit](Queue* q) {while(!exit) {q->Consume();}};
+    auto sumOne = [](int &n) {return n + 1;};
+
+    std::thread t1(consume, this->_queue);
+
+    auto retTwo = _queue->Produce(sumOne, 1);
+    auto retThree = _queue->Produce(sumOne, 2);
+    auto retFour = _queue->Produce(sumOne, 3);
+    auto retFive = _queue->Produce(sumOne, 4);
+
+    EXPECT_EQ(retTwo.get(), 2);
+    EXPECT_EQ(retThree.get(), 3);
+    EXPECT_EQ(retFour.get(), 4);
+    EXPECT_EQ(retFive.get(), 5);
+
+    exit.exchange(true);
+    t1.join();
 }
