@@ -9,7 +9,7 @@ constexpr uint32_t kCacheLineSize = 128;
 
 // Lock-free Queue of Tasks:
 //  - the first element is ALWAYS a dummy element that is deleted after executing the next element,
-//    after deleting the first element, the executed elements remains as the dummy element.
+//    after deleting the first element, the executed elements becomes the dummy element.
 //  - Producers threads adds new Tasks to the TAIL of the Queue.
 //  - Consumer threads execute Task on the HEAD of the Queue.
 class Queue {
