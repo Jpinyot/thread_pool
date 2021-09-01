@@ -39,7 +39,8 @@ namespace thread_pool {
                     // get return type
                     typedef decltype(function(args...)) RetType;
                     // package the task
-                    std::packaged_task<RetType()> newTask(std::move(std::bind(function, args...)));
+                    std::packaged_task<RetType()> newTask(std::bind(function,
+                                std::forward<Args>(args)...));
                     // get the future from the task before the task is moved into the queue
                     std::future<RetType> future = newTask.get_future();
                     // cretate new Task
@@ -72,20 +73,17 @@ namespace thread_pool {
                 Task* oldFirst = _first;
                 // if queue is nonempty
                 if (next != nullptr) {
-                    // TODO(jpinyto): get function to avoid data races
                     // get function from the Task
-                    /* auto function = next->GetFunction(); */
+                    auto function = next->GetFunction();
                     // move first pointer to the next pointer
                     _first = next;
                     // release exclusivity
                     _consumerLock.exchange(false);
                     // execute function if is valid
-                    next->Execute();
-                    /* if (function.valid()) { */
-                    /*     function(); */
-                    /* } */
+                    if (function.valid()) {
+                        function();
+                    }
                     // delete old first Task
-                    // TODO(jpinyot): move to the critical section??
                     delete oldFirst;
                 }
                 // queue is empty
@@ -103,44 +101,31 @@ namespace thread_pool {
                     Task():
                         next(nullptr) {
                         /* _function() { */
-                        }
+                    }
                     ~Task() = default;
 
                 public:
                     // get function
-                    /* virtual std::packaged_task<void()>GetFunction() = 0; */
-                    /* virtual std::packaged_task<void()>GetFunction() {}; */
-                    // execute
-                    virtual void Execute() {};
+                    virtual std::packaged_task<void()> GetFunction() {};
                     // pointer to the next object in the Queue
                     // TODO(jpinyot): Move to private
                     std::atomic<Task*> next;
-
-                private:
-                    // while copyng the argument
-                    /* std::packaged_task<void()> _function; */
-                    //TODO(jpinyot): add padding??
             };  // class Task
 
             // used polymorphism to store any type of funtion in the job
             template <typename RetType>
-                class AnyTask : public Task {
-                    public:
-                        AnyTask(std::packaged_task<RetType()> function):
-                            Task(),
-                            _function(std::move(function))
-                    {
-                    }
-                    void Execute() override {
-                        if (_function.valid()) {
-                            _function();
-                        }
-                    }
-                    /* std::packaged_task<RetType()>GetFunction() override {return std::move(_function);} */
+            class AnyTask : public Task {
+                public:
+                    AnyTask(std::packaged_task<RetType()> function):
+                        Task(),
+                        _function(std::move(function)) {
+                }
+                // get function
+                std::packaged_task<void()>GetFunction() override {return std::move(_function);}
 
-                    private:
-                        std::packaged_task<RetType()> _function;
-                };  // class AnyTask
+                private:
+                    std::packaged_task<void()> _function;
+            };  // class AnyTask
 
             //TODO(jpinyot): add padding to each pointer
             // first element
