@@ -43,7 +43,7 @@ TEST_F(QueueUt, setupTearDown)
 // produce and consume one Task using only one thread
 TEST_F(QueueUt, OneThreadProduceAndConsume)
 {
-    auto sumOne = [](int &n) {return n + 1;};
+    auto sumOne = [](const int& n) {return n + 1;};
 
     auto retNum = _queue->Produce(sumOne, 1);
     _queue->Consume();
@@ -58,7 +58,7 @@ TEST_F(QueueUt, OneProducerOneConsumerMultiTasks)
     exit.exchange(false);
 
     auto consume = [&exit](Queue* q) {while(!exit) {q->Consume();}};
-    auto sumOne = [](int &n) {return n + 1;};
+    auto sumOne = [](const int& n) {return n + 1;};
 
     std::thread t1(consume, this->_queue);
 
@@ -83,7 +83,7 @@ TEST_F(QueueUt, MultiProducersOneConsumerMultiTasks)
     exit.exchange(false);
 
     auto consume = [&exit](Queue* q) {while(!exit) {q->Consume();}};
-    auto sumOne = [](int &n) {return n + 1;};
+    auto sumOne = [](const int& n) {return n + 1;};
 
     std::thread t1(consume, this->_queue);
     std::thread t2(consume, this->_queue);
@@ -107,4 +107,50 @@ TEST_F(QueueUt, MultiProducersOneConsumerMultiTasks)
     t1.join();
     t2.join();
     t3.join();
+}
+
+int fibonacci(const int& n) {
+    if (n == 0) {return 0;}
+    if (n == 1) {return 1;}
+    return fibonacci(n-1) + fibonacci(n-2);
+}
+
+// multi producers threads and one consumer thread with multiple big Tasks
+TEST_F(QueueUt, MultiProducersOneConsumerMultiBigTasks)
+{
+    std::atomic<bool> exit;
+    exit.exchange(false);
+
+    auto consume = [&exit](Queue* q) {while(!exit) {q->Consume();}};
+
+    std::thread t1(consume, this->_queue);
+    std::thread t2(consume, this->_queue);
+    std::thread t3(consume, this->_queue);
+    std::thread t4(consume, this->_queue);
+
+    auto fib37 = _queue->Produce(fibonacci, 37);
+    auto fib36 = _queue->Produce(fibonacci, 36);
+    auto fib35 = _queue->Produce(fibonacci, 35);
+    auto fib34 = _queue->Produce(fibonacci, 34);
+    auto fib33 = _queue->Produce(fibonacci, 33);
+    auto fib32 = _queue->Produce(fibonacci, 32);
+    auto fib25 = _queue->Produce(fibonacci, 25);
+    auto fib22 = _queue->Produce(fibonacci, 22);
+    auto fib12 = _queue->Produce(fibonacci, 12);
+
+    EXPECT_EQ(fib12.get(), 144);
+    EXPECT_EQ(fib22.get(), 17711);
+    EXPECT_EQ(fib25.get(), 75025);
+    EXPECT_EQ(fib32.get(), 2178309);
+    EXPECT_EQ(fib33.get(), 3524578);
+    EXPECT_EQ(fib34.get(), 5702887);
+    EXPECT_EQ(fib35.get(), 9227465);
+    EXPECT_EQ(fib36.get(), 14930352);
+    EXPECT_EQ(fib37.get(), 24157817);
+
+    exit.exchange(true);
+    t1.join();
+    t2.join();
+    t3.join();
+    t4.join();
 }
