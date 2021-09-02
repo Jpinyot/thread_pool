@@ -8,7 +8,7 @@ namespace thread_pool {
             MDList(const uint32_t& depth):
                 _nodes() {
                 // initialize nodes pointers
-                for (uint32_t i = 0; i < depth; i++) {
+                for (uint32_t i = 0; i <= depth; i++) {
                     _nodes.emplace_back(new Queue());
                 }
             }
@@ -24,12 +24,13 @@ namespace thread_pool {
             // add new task to the queue
             template<class F, class ... Args>
             auto Produce(const uint32_t& p, F&& function, Args&& ... args) {
-                if (p < _nodes.size()) {
-                    return _nodes.at(p)->Produce(std::bind(function, std::forward<Args>(args)...));
-                }
+                // set position to last if given position is to high
+                int position = (p < _nodes.size())? p : (_nodes.size() - 1);
+                // produce new Task
+                return _nodes.at(position)->Produce(std::bind(function,
+                            std::forward<Args>(args)...));
             }
-            // TODO(jpinyot): change comment
-            // consume one task from the most biggest priority avalible
+            // consume one task from the highest priority avalible
             void Consume() {
                 for (const auto node : _nodes) {
                     if (node->TasksCount()) {
