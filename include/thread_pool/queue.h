@@ -146,7 +146,7 @@ namespace thread_pool {
             std::atomic<bool> _consumerLock;
             // shared among producers
             std::atomic<bool> _producerLock;
-            // number of task remaining in the Queue
+            // number of tasks remaining in the Queue
             std::atomic<uint32_t> _taskCount;
     };  // class Queue
 };  // namespace thread_pool

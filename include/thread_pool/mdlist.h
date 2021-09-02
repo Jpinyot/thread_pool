@@ -1,6 +1,6 @@
 #include <vector>
 
-#include <thread_pool/queue.h>
+#include "thread_pool/queue.h"
 
 namespace thread_pool {
     class MDList {
@@ -31,18 +31,18 @@ namespace thread_pool {
                             std::forward<Args>(args)...));
             }
             // consume one task from the highest priority avalible
-            void Consume() {
+            bool Consume() {
                 for (const auto node : _nodes) {
                     if (node->TasksCount()) {
                         node->Consume();
-                        break;
+                        return true;
                     }
                 }
+                return false;
             }
 
         private:
-            // pointers to the nodes of the list
-            // TODO(jpinyot): convert to a vector of unique_ptr
+            // pointers to the queues
             std::vector<Queue*> _nodes;
     };  // class MDList
 }  // namespace thread_pool
