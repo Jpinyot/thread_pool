@@ -47,6 +47,7 @@ TEST_F(QueueUt, OneThreadProduceAndConsume)
     auto sumOne = [](const int& n) {return n + 1;};
 
     auto retNum = _queue->Produce(sumOne, 1);
+    EXPECT_EQ(_queue->TasksCount(), 1);
     _queue->Consume();
 
     EXPECT_EQ(retNum.get(), 2);
@@ -72,6 +73,7 @@ TEST_F(QueueUt, OneProducerOneConsumerMultiTasks)
     EXPECT_EQ(retThree.get(), 3);
     EXPECT_EQ(retFour.get(), 4);
     EXPECT_EQ(retFive.get(), 5);
+    EXPECT_EQ(_queue->TasksCount(), 0);
 
     exit.exchange(true);
     t1.join();
@@ -103,6 +105,7 @@ TEST_F(QueueUt, OneProducerMultiConsumerMultiTasks)
     EXPECT_EQ(retFive.get(), 5);
     EXPECT_EQ(retSix.get(), 6);
     EXPECT_EQ(retSeven.get(), 7);
+    EXPECT_EQ(_queue->TasksCount(), 0);
 
     exit.exchange(true);
     t1.join();
