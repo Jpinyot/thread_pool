@@ -10,3 +10,4 @@ https://codereview.stackexchange.com/questions/240937/easy-to-use-thread-pool-im
 https://www.drdobbs.com/article/print?articleId=210604448&siteSectionName=parallel
 https://www.drdobbs.com/article/print?articleId=211601363&siteSectionName=parallel
 https://www.drdobbs.com/article/print?articleId=212201163&siteSectionName=parallel
+https://www.osti.gov/pages/servlets/purl/1237474
