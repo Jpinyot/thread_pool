@@ -18,7 +18,8 @@ namespace thread_pool {
         public:
             Queue():
                 _first(nullptr), _last(nullptr),
-                _consumerLock(false), _producerLock(false) {
+                _consumerLock(false), _producerLock(false),
+                _taskCount(0) {
                     // init list with dummy element
                     _first = _last = new Task();
                 }
@@ -54,6 +55,8 @@ namespace thread_pool {
                     _last->next = tmp;
                     // swing last forward
                     _last = tmp;
+                    // increase task count
+                    _taskCount += 1;
                     // release exclusivity
                     _producerLock = false;
 
@@ -77,6 +80,8 @@ namespace thread_pool {
                     auto function = next->GetFunction();
                     // move first pointer to the next pointer
                     _first = next;
+                    // decrease task count
+                    _taskCount -= 1;
                     // release exclusivity
                     _consumerLock.exchange(false);
                     // execute function if is valid
@@ -91,6 +96,11 @@ namespace thread_pool {
                     // release exclusivity
                     _consumerLock.exchange(false);
                 }
+            }
+
+            // return number of tasks remaining
+            uint32_t TasksCount() {
+                return _taskCount;
             }
 
 
@@ -136,5 +146,7 @@ namespace thread_pool {
             std::atomic<bool> _consumerLock;
             // shared among producers
             std::atomic<bool> _producerLock;
+            // number of task remaining in the Queue
+            std::atomic<uint32_t> _taskCount;
     };  // class Queue
 };  // namespace thread_pool
