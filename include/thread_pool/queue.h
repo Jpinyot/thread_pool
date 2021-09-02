@@ -36,35 +36,35 @@ namespace thread_pool {
             // add new task to the queue
             // returns a future
             template<class F, class ... Args>
-                auto Produce(F&& function, Args&& ... args) {
-                    // get return type
-                    typedef decltype(function(args...)) RetType;
-                    // package the task
-                    std::packaged_task<RetType()> newTask(std::bind(function,
-                                std::forward<Args>(args)...));
-                    // get the future from the task before the task is moved into the queue
-                    std::future<RetType> future = newTask.get_future();
-                    // cretate new Task
-                    Task* tmp = new AnyTask<RetType>(std::move(newTask));
+            auto Produce(F&& function, Args&& ... args) {
+                // get return type
+                typedef decltype(function(args...)) RetType;
+                // package the task
+                std::packaged_task<RetType()> newTask(std::bind(function,
+                            std::forward<Args>(args)...));
+                // get the future from the task before the task is moved into the queue
+                std::future<RetType> future = newTask.get_future();
+                // cretate new Task
+                Task* tmp = new AnyTask<RetType>(std::move(newTask));
 
-                    // wait until acquire exclusivity
-                    while (_producerLock.exchange(true)) {
-                    }
-
-                    // publish to consumers
-                    _last->next = tmp;
-                    // swing last forward
-                    _last = tmp;
-                    // increase task count
-                    _taskCount += 1;
-                    // release exclusivity
-                    _producerLock = false;
-
-                    // TODO(jpinyot): notofy a thread that there is a new job!!!??
-
-                    // return the future
-                    return future;
+                // wait until acquire exclusivity
+                while (_producerLock.exchange(true)) {
                 }
+
+                // publish to consumers
+                _last->next = tmp;
+                // swing last forward
+                _last = tmp;
+                // increase task count
+                _taskCount += 1;
+                // release exclusivity
+                _producerLock = false;
+
+                // TODO(jpinyot): notofy a thread that there is a new job!!!??
+
+                // return the future
+                return future;
+            }
 
             // consume existing task
             void Consume() {
