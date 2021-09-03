@@ -47,3 +47,19 @@ TEST_F(ThreadPoolUt, OneTaskPushed)
 
     EXPECT_EQ(retNum.get(), 2);
 }
+
+// multiple Task pushed
+TEST_F(ThreadPoolUt, MultiTasksPushed)
+{
+    auto sumOne = [](const int& n) {return n + 1;};
+
+    std::vector<std::future<int>> retVal;
+
+    for (int i = 0; i < 100; i++) {
+        retVal.push_back(_threadPool->Push(0, sumOne, i));
+    }
+
+    for (int i = 0; i < 100; i++) {
+        EXPECT_EQ(retVal.at(i).get(), i + 1);
+    }
+}
