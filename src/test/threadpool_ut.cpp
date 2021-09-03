@@ -9,7 +9,7 @@
 using thread_pool::ThreadPool;
 
 constexpr uint32_t kPriorityCount = 3;
-constexpr uint32_t kThreadCount = 6;
+constexpr uint32_t kThreadCount = 4;
 
 class ThreadPoolUt : public ::testing::Test{
     public:
@@ -43,7 +43,6 @@ TEST_F(ThreadPoolUt, OneTaskPushed)
     auto sumOne = [](const int& n) {return n + 1;};
 
     auto retNum = _threadPool->Push(2, sumOne, 1);
-    /* _threadPool->Consume(); */
 
     EXPECT_EQ(retNum.get(), 2);
 }
@@ -51,15 +50,16 @@ TEST_F(ThreadPoolUt, OneTaskPushed)
 // multiple Task pushed
 TEST_F(ThreadPoolUt, MultiTasksPushed)
 {
+    int itrerationCount = 100;
     auto sumOne = [](const int& n) {return n + 1;};
 
     std::vector<std::future<int>> retVal;
 
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < itrerationCount; i++) {
         retVal.push_back(_threadPool->Push(0, sumOne, i));
     }
 
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < itrerationCount; i++) {
         EXPECT_EQ(retVal.at(i).get(), i + 1);
     }
 }
