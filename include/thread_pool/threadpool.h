@@ -18,7 +18,10 @@ namespace thread_pool {
                 createWorkers(threadsCount);
             }
             ~ThreadPool() {
+                // exit running
                 _running = false;
+                // notify all
+                _condVar.notify_all();
                 // destroy threads
                 destroyWorkers();
             }
@@ -28,7 +31,7 @@ namespace thread_pool {
             template<class F, class ... Args>
             auto Push(const uint32_t& p, F&& function, Args&& ... args) {
                 // produce new task
-                auto retVal = _tasks.Produce(std::bind(function, std::forward<Args>(args)...));
+                auto retVal = _tasks.Produce(p, std::bind(function, std::forward<Args>(args)...));
                 // notify one
                 _condVar.notify_one();
 
@@ -47,7 +50,7 @@ namespace thread_pool {
             // create all requested threads
             void createWorkers(const uint32_t& threadsCount) {
                 for (uint32_t i = 0; i < threadsCount; i++) {
-                    std::thread(&ThreadPool::worker, this);
+                    _workers.emplace_back(std::thread(&ThreadPool::worker, this));
                 }
             }
             // destroy all threads
