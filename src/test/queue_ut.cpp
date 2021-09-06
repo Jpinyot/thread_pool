@@ -41,6 +41,19 @@ TEST_F(QueueUt, setupTearDown)
     EXPECT_EQ(1,1);
 }
 
+// produce and consume one Task using only one thread modify reference
+TEST_F(QueueUt, OneThreadProduceAndConsumeModifyReference)
+{
+    auto makeItTwo = [](int& n) {n = 2;};
+
+    int n = 0;
+    auto ret = _queue->Produce(makeItTwo, std::ref(n));
+    EXPECT_EQ(_queue->TasksCount(), 1);
+    _queue->Consume();
+
+    EXPECT_EQ(n, 2);
+}
+
 // produce and consume one Task using only one thread
 TEST_F(QueueUt, OneThreadProduceAndConsume)
 {
