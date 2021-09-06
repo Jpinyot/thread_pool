@@ -5,10 +5,17 @@
 
 #include "thread_pool/mdlist.h"
 
+// default value for the number of prioritys
+constexpr uint32_t kPriorityCount = 1;
+// determine how many cores a machine has
+// may return 0 when not able to detect
+const uint32_t kProcessorCount = std::thread::hardware_concurrency();
+
 namespace thread_pool {
     class ThreadPool {
         public:
-            ThreadPool(const uint32_t& priorityCount, const uint32_t& threadsCount):
+            ThreadPool(const uint32_t& priorityCount = 1,
+                    const uint32_t& threadsCount = (kProcessorCount != 0)? kProcessorCount : 1):
                 _tasks(priorityCount),
                 _condVar(),
                 _mutexWorkers(),
@@ -39,7 +46,6 @@ namespace thread_pool {
             }
 
         private:
-            // two dimension list with ...TODO
             MDList _tasks;
             std::condition_variable _condVar;
             std::mutex _mutexWorkers;
