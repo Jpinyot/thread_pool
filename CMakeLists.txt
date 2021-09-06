@@ -15,18 +15,15 @@ message("\n## Configuring ${PROJECT_NAME} v${PROJECT_VERSION}")
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
 #####################  VERSION DEFINITION  #############################
-add_definitions(-DPARSER_NISX_LIB_VERSION_MAJOR=${PROJECT_VERSION_MAJOR})
-add_definitions(-DPARSER_NISX_LIB_VERSION_MINOR=${PROJECT_VERSION_MINOR})
-add_definitions(-DPARSER_NISX_LIB_VERSION_BUILD=${PROJECT_VERSION_PATCH})
-add_definitions(-DPARSER_NISX_LIB_VERSION="${PROJECT_VERSION}")
-add_definitions(-DPARSER_NISX_LIBRARY) #Legacy define
+add_definitions(-DTHREAD_POOL_LIB_VERSION_MAJOR=${PROJECT_VERSION_MAJOR})
+add_definitions(-DTHREAD_POOL_LIB_VERSION_MINOR=${PROJECT_VERSION_MINOR})
+add_definitions(-DTHREAD_POOL_LIB_VERSION_BUILD=${PROJECT_VERSION_PATCH})
+add_definitions(-DTHREAD_POOL_LIB_VERSION="${PROJECT_VERSION}")
+add_definitions(-DTHREAD_POOL_LIBRARY) #Legacy define
 
 ################### EXTERNAL DEPENDENCIES  ############################
 find_package(Threads REQUIRED)
 set(EXTERNAL_LIBS Threads::Threads)
-
-##################  LOADING MODULES  ###########################
-# include(${PROJECT_SOURCE_DIR}/cmake/dependencies.cmake)
 
 ####################  SOURCES AND HEADERS  #############################
 
@@ -62,21 +59,12 @@ endif()
 add_definitions(-DTIXML_USE_STL)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}
-	# ${LIB_PREFIX}/include
 	${CMAKE_CURRENT_SOURCE_DIR}/include
 	)
 
 
 add_subdirectory(${PROJECT_SOURCE_DIR}/src ${PROJECT_BINARY_DIR}/src)
 add_subdirectory(${PROJECT_SOURCE_DIR}/include ${PROJECT_BINARY_DIR}/include)
-
-set (SOURCES ${SOURCES}
-	${CMAKE_CURRENT_SOURCE_DIR}/src
-	)
-
-set(HEADERS ${HEADERS}
-	${CMAKE_CURRENT_SOURCE_DIR}/include
-	)
 
 if (${ENABLE_TESTS})
     set(SRC_TEST ${SRC_TEST})
