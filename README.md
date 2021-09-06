@@ -13,12 +13,12 @@ std::future<RetType> ThreadPool::Push(F&&, Args&& ...)`
 
 ## Usage
 ### Including the library
-### Working with prioritys
-### Setting number of threads
-The constructor of the main class `ThreadPool` have to input arguments `PriorityCount` and `ThreadCount`
+The project includes a `CMakeLists.txt` that construct the library.
+### Construct the class
+The constructor of the main class `ThreadPool` have as input arguments `PriorityCount` specifing the number of prioritys the `MDList` will have(beeing 1 if not specify) and `ThreadCount` specifing the number of thread the `ThreadPool` will have(beeing the number of cores the machine have if not specifyed).
 ### Setting padding size
+We use padding to ensure that two separate variables that should be able to be used concurrenctly by different threads are also on different cache lines.
 ### Blocking vs reschedule the execution
-
 ### Submitting and waiting for tasks
 A task can be any function, with or without arguments and/or return value. Once a task has been submitted to the queue, it will be executed as soon as a thread becomes avalible. Tasks are executed respecting the priority order(beeing 0 the first priority up to n beeing the last to be exectued) and int the order that they were submitted(FIFO) if they have the same priority.
 
