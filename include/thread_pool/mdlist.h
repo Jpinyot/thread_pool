@@ -8,7 +8,7 @@ namespace thread_pool {
             MDList(const uint32_t& depth):
                 _nodes() {
                 // initialize nodes pointers
-                for (uint32_t i = 0; i <= depth; i++) {
+                for (uint32_t i = 0; i < depth; i++) {
                     _nodes.emplace_back(new Queue());
                 }
             }
