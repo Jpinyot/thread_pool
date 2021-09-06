@@ -8,7 +8,7 @@
 
 using thread_pool::ThreadPool;
 
-constexpr uint32_t kPriorityCount = 3;
+constexpr uint32_t kPriorityCountTest = 3;
 constexpr uint32_t kThreadCount = 4;
 
 class ThreadPoolUt : public ::testing::Test{
@@ -20,7 +20,7 @@ class ThreadPoolUt : public ::testing::Test{
 
         void SetUp() {
             // code here will execute just before the test ensues
-            _threadPool = new ThreadPool(kPriorityCount, kThreadCount);
+            _threadPool = new ThreadPool(kPriorityCountTest, kThreadCount);
         }
 
         void TearDown() {
