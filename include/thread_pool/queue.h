@@ -60,8 +60,6 @@ namespace thread_pool {
                 // release exclusivity
                 _producerLock = false;
 
-                // TODO(jpinyot): notofy a thread that there is a new job!!!??
-
                 // return the future
                 return future;
             }
