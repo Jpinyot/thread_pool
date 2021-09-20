@@ -70,7 +70,9 @@ namespace thread_pool {
                 std::unique_lock<std::mutex> lock(_mutexWorkers);
                 while (_running) {
                     if (!_tasks.Consume()) {
+                        // TODO(jpinyot): Prevent all thread to wait with task on the queue
                         _condVar.wait(lock);
+                        /* std::this_thread::yield(); */
                     }
                 }
             }
