@@ -14,6 +14,11 @@ message("\n## Configuring ${PROJECT_NAME} v${PROJECT_VERSION}")
 ## Add compile commands
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
+##################### EXTERNAL DEPENDENCIES ############################
+set(CXX_VERSION_COMPILE_FLAGS "-std=c++14")
+
+add_definitions($(CXX_VERSION_COMPILE_FLAGS))
+
 #####################  VERSION DEFINITION  #############################
 add_definitions(-DTHREAD_POOL_LIB_VERSION_MAJOR=${PROJECT_VERSION_MAJOR})
 add_definitions(-DTHREAD_POOL_LIB_VERSION_MINOR=${PROJECT_VERSION_MINOR})
